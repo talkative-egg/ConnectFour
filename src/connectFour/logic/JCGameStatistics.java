@@ -1,19 +1,43 @@
 package connectFour.logic;
 
+/**
+ * @author xuesheng (chenji@thayer.org)
+ * Date created: Feb 12, 2021
+ * Date due: FEb 24, 2021
+ * This program simulates the popular board game -- Connect Four
+ * This class tracks the statistics of multiple games
+ */
+
 import connectFour.domain.JCList;
 
 public class JCGameStatistics {
-	
+
+	//private instance variables
 	private JCList<String> redStatistics;
 	private JCList<String> yellowStatistics;
 	private int games;
 	
+	
+	
+	
+	//default constructor
 	public JCGameStatistics() {
-		redStatistics = new JCList<>();
-		yellowStatistics = new JCList<>();
+		
+		//instantiating a new JCList class using the default constructor
+		redStatistics = new JCList<String>();
+		//instantiating a new JCList class using the default constructor
+		yellowStatistics = new JCList<String>();
 		games = 0;
+		
 	}
 	
+	
+	
+	
+	
+	//methods
+	
+	//adds the info of the players to the lists
 	public void addGamePlayers(String redPlayer, String yellowPlayer) {
 		
 		redStatistics.add(redPlayer + " ");
@@ -21,6 +45,7 @@ public class JCGameStatistics {
 		
 	}
 	
+	//adds the results of the game to the lists
 	public void addGameResults(int winner) {
 		
 		if(winner == 0) {
@@ -40,6 +65,7 @@ public class JCGameStatistics {
 		
 	}
 	
+	//prints out the statistics
 	public void printStatistics() {
 		
 		System.out.println("Game Statistics\n");

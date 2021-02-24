@@ -3,7 +3,7 @@ package connectFour;
 /**
  * @author xuesheng (chenji@thayer.org)
  * Date created: Feb 12, 2021
- * Date due: FEb 24, 2021
+ * Date due: Feb 24, 2021
  * This program simulates the popular board game -- Connect Four
  * This is a driver class that sets up the game
  */
@@ -15,9 +15,13 @@ public class JCConnectFour {
 	
 	public static void main(String[] args) {
 		
+		//instantiating a new JCGameGenerator object using the default constructor
 		JCGameGenerator game = new JCGameGenerator();
+		
+		//instantiating a new JCGameStatistics object using the default constructor
 		JCGameStatistics stats = new JCGameStatistics();
 		
+		//declared to represent the user input
 		String input;
 		
 		//starts a game
@@ -51,6 +55,7 @@ public class JCConnectFour {
 			
 		}while(input.contains("yes"));
 		
+		//prints the statistics of the games
 		stats.printStatistics();
 		
 	}

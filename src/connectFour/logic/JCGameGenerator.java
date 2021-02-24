@@ -3,7 +3,7 @@ package connectFour.logic;
 /**
  * @author xuesheng (chenji@thayer.org)
  * Date created: Feb 12, 2021
- * Date due: FEb 24, 2021
+ * Date due: Feb 24, 2021
  * This program simulates the popular board game -- Connect Four
  * This class generates the game and interacts with the board and the players
  */
@@ -19,6 +19,9 @@ public class JCGameGenerator {
 	private JCPlayer yellow;
 	private JCPlayer currentPlayer; //this variable either references to red or yellow, represents the player about to make a move
 	
+	
+	
+	
 	//default constructor
 	public JCGameGenerator() {
 		board = null;
@@ -29,40 +32,51 @@ public class JCGameGenerator {
 	
 	
 	
+	
+	
 	//methods
 	
+	//returns the identity of red player
 	public String getRedPlayer() {
 		return red.getPlayer();
 	}
 	
+	//returns the identity of yellow player
 	public String getYellowPlayer() {
 		return yellow.getPlayer();
 	}
 	
-	//this method sets up the players, asks the user whether each player is human or computer
-	private void setPlayers() {
+	//takes in the symbol of the player, sets the player, and returns the player
+	private JCPlayer setOnePlayer(char symbol) {
 		
+		String playerColor = (symbol == 'R')? "Red":"Yellow";
+		JCPlayer player = null;
+		
+		//asks the user if the player is human or computer
 		do {
 			
-			String player1 = JOptionPane.showInputDialog("Is red human or computer?");
+			String input = JOptionPane.showInputDialog("Is " + playerColor + " human or computer?");
 			
 			try {
-				player1 = player1.trim().toLowerCase();
+				input = input.trim().toLowerCase();
 			}catch(NullPointerException e) {
 				System.exit(0);
 			}
 			
-			if(player1.contains("human")) {
-				red = new JCPlayer('R', "human");
-			}else if(player1.contains("computer")){
-				red = new JCPlayer('R',"computer");
+			if(input.contains("human")) {
+				//instantiating a new JCPlayer object using the overloaded constructor
+				player = new JCPlayer(symbol, "human");
+			}else if(input.contains("computer")){
+				//instantiating a new JCPlayer object using the overloaded constructor
+				player = new JCPlayer(symbol,"computer");
 			}
 			
-		}while(red == null);
+		}while(player == null);
 		
-		if(red.getPlayer().equals("human")) {
+		//if player is human, asks the user if it should be timed
+		if(player.getPlayer().equals("human")) {
 			
-			String timed = JOptionPane.showInputDialog("Is Red timed (3 minuted total)? (yes/no)");
+			String timed = JOptionPane.showInputDialog("Is " + playerColor + " timed (3 minuted total)? (yes/no)");
 			
 			try {
 				timed = timed.toLowerCase();
@@ -71,75 +85,24 @@ public class JCGameGenerator {
 			}
 			
 			if(timed.contains("yes")) {
-				red.timePlayer();
-			}
-			
-		}else if(red.getPlayer().equals("computer")){
-			
-			String ai = JOptionPane.showInputDialog("Is Red an AI? (yes/no)");
-			
-			try {
-				ai = ai.toLowerCase();
-			}catch(NullPointerException e) {
-				System.exit(0);
-			}
-			
-			if(ai.contains("yes") || ai.contains("ai")) {
-				red.changeToAI();
+				player.timePlayer();
 			}
 			
 		}
 		
-		do {
-			
-			String player2 = JOptionPane.showInputDialog("Is yellow human or computer?");
-			
-			try {
-				player2 = player2.trim().toLowerCase();
-			}catch(NullPointerException e) {
-				System.exit(0);
-			}
-			
-			if(player2.contains("human")) {
-				yellow = new JCPlayer('Y', "human");
-			}else if(player2.contains("computer")){
-				yellow = new JCPlayer('Y',"computer");
-			}
-			
-		}while(yellow == null);
-		
-		if(yellow.getPlayer().equals("human")) {
-			
-			String timed = JOptionPane.showInputDialog("Is Yellow timed (3 minutes total)? (yes/no)");
-			
-			try {
-				timed = timed.toLowerCase();
-			}catch(NullPointerException e) {
-				System.exit(0);
-			}
-			
-			if(timed.contains("yes")) {
-				yellow.timePlayer();
-			}
-			
-		}else if(yellow.getPlayer().equals("computer")) {
-			
-			String ai = JOptionPane.showInputDialog("Is Yellow an AI? (yes/no)");
-			
-			try {
-				ai = ai.toLowerCase();
-			}catch(NullPointerException e) {
-				System.exit(0);
-			}
-			
-			if(ai.contains("yes") || ai.contains("ai")) {
-				yellow.changeToAI();
-			}
-			
-		}
+		return player;
 		
 	}
 	
+	//this method sets up the players
+	private void setPlayers() {
+		
+		red = setOnePlayer('R');
+		yellow = setOnePlayer('Y');
+		
+	}
+	
+	//this method sets up the game board
 	private void setBoard() {
 		
 		do {
@@ -153,15 +116,18 @@ public class JCGameGenerator {
 			}
 			
 			if(input.contains("default")) {
+				//instantiating a new JCBoard object using the default constructor
 				board = new JCBoard();
 			}else if(input.contains("custom")) {
 				
 				int row = promptNumber("How many rows?", 4, 9);
 				int column = promptNumber("How many columns?", 4, 9);
 				
+				//the connect pieces must be greater than 3 and smaller than or equal to the smaller one of row and column
 				int connect = (row < column)? 
 						promptNumber("Connect how many pieces?", 3, row):promptNumber("Connect how many pieces?", 3, column);
 				
+				//instantiating a new JCBoard object using the overloaded constructor
 				board = new JCBoard(row, column, connect);
 				
 			}
@@ -170,6 +136,8 @@ public class JCGameGenerator {
 		
 	}
 	
+	//takes in the message for the prompt, the range the input must be in
+	//returns the number inputted by the user
 	private int promptNumber(String message, int rangeStart, int rangeEnd) {
 		
 		String display = message;
@@ -191,6 +159,7 @@ public class JCGameGenerator {
 		
 	}
 	
+	//parameter takes in the statistics object to add player infos to
 	//this method sets up the board and the players
 	public void startGame(JCGameStatistics stats) {
 		
@@ -210,22 +179,39 @@ public class JCGameGenerator {
 	public void nextRound(){
 		
 		int column;
+		
+		//we don't know if the column if full or not, set it to false for now
 		boolean columnFull = false;
 		
+		//asks the user to enter column number until the number is valid
 		do {
 			
-			column = currentPlayer.move(columnFull, board.getColumnNumber(), board);
+			//if the column was full last time and it's a human player, then tell them it was full
+			if(columnFull && currentPlayer.getPlayer().equals("human")) {
+				System.out.println("THE COLUMN YOU ENTERED WAS FULL");
+				System.out.println();
+				System.out.println();
+				System.out.println();
+				System.out.println();
+			}
 			
+			column = currentPlayer.move(board.getColumnNumber());
+			
+			//if the loop continues, it must mean that the column is full
 			columnFull = true;
 			
 			currentPlayer.checkTimeUp();
 			
+			//if columns is smaller than 0, then it means that the time is up, then move again (but it is computer now)
 			if(column < 0) {
-				column = currentPlayer.move(columnFull, board.getColumnNumber(), board);
+				column = currentPlayer.move(board.getColumnNumber());
 			}
 			
-		}while(!isValidMove(currentPlayer.getCheckerSymbol(), column));
+		}while(!isValidMove(column));
 		
+		board.addChecker(currentPlayer.getCheckerSymbol(), column);
+		
+		//delays one second if the player is computer
 		if(currentPlayer.getPlayer().contains("computer")) {
 			try {
 				Thread.sleep(1000);
@@ -242,16 +228,14 @@ public class JCGameGenerator {
 		
 	}
 	
-	//this method checks if the column is valid to drop the checker in
-	//if the column is valid, then drop the checker and return true
-	//if not, return false
-	private boolean isValidMove(char symbol, int column) {
+	//return true if the column is not full and false otherwise
+	private boolean isValidMove(int column) {
 		
-		return board.addChecker(symbol, column);
+		return !board.columnFull(column);
 		
 	}
 	
-	//returns true if there are four checkers in a row or the board is filled (i.e. when the game ends)
+	//returns true if there are the checkers are in a row or the board is filled (i.e. when the game ends)
 	//returns false otherwise
 	public boolean gameOver() {
 		
@@ -260,6 +244,7 @@ public class JCGameGenerator {
 	}
 	
 	//returns 1 if red wins, 2 if yellow wins, 0 if it is a tie, and -1 if the game is not end and there is a glitch
+	//this makes it easier for the stats class to know who won
 	public int getWinnerForStats() {
 		
 		if(board.connectedInARow()) { //if this is true, then there is definitely a winner
@@ -281,6 +266,7 @@ public class JCGameGenerator {
 		
 	}
 	
+	//returns the String version of the winner to print out
 	public String getWinner() {
 		
 		if(board.connectedInARow()) { //if this is true, then there is definitely a winner

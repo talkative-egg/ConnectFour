@@ -3,7 +3,7 @@ package connectFour.domain;
 /**
  * @author xuesheng (chenji@thayer.org)
  * Date created: Feb 12, 2021
- * Date due: FEb 24, 2021
+ * Date due: Feb 24, 2021
  * This program simulates the popular board game -- Connect Four
  * This class represents a player of the game
  */
@@ -42,14 +42,8 @@ public class JCPlayer {
 	
 	//methods
 	
-	public void changeToAI() {
-		
-		if(player.equals("computer")) {
-			player = "computerAI";
-		}
-		
-	}
-	
+	//this method checks if time is up
+	//if time is up, then let the computer take over the player's moves
 	public void checkTimeUp() {
 		if(timer != null && timer.timeUp()) {
 			player = "computer";
@@ -60,10 +54,13 @@ public class JCPlayer {
 		}
 	}
 	
+	//this method generates a timer for this player
 	public void timePlayer() {
+		//instantiating a new JCTimer object using the default constructor
 		timer = new JCTimer();
 	}
 	
+	//returns the player, either "human" or "computer"
 	public String getPlayer() {
 		return player;
 	}
@@ -73,18 +70,16 @@ public class JCPlayer {
 		return symbol;
 	}
 	
-	//the parameter passes in if the human player should be noticed that the column previously entered was full
+	//the parameter passes in the number of columns in the board
 	//calls the method humanMove if this player is a human
 	//calls the method computerMove if this player is a computer
 	//returns the column of which the player should drop the checker
-	public int move(boolean previousColumnFull, int rangeEnd, JCBoard board){
+	public int move(int rangeEnd){
 		
 		if(player.equals("human")) {
-			return humanMove(previousColumnFull, rangeEnd);
+			return humanMove(rangeEnd);
 		}else if(player.equals("computer")) {
 			return computerMove(rangeEnd);
-		}else if(player.equals("computerAI")){
-			return computerAIMove(board);
 		}else {
 			throw new IllegalArgumentException("What the heck is the player?");
 		}
@@ -92,23 +87,31 @@ public class JCPlayer {
 	}
 	
 	//prompts the human player to enter the column of which the checker should be dropped
-	//the parameter passes in if the human player should be noticed that the column previously entered was full
+	//the parameter passes in the number of columns in the baord
 	//returns the column of which the human player wants to drop the checker
-	private int humanMove(boolean previousColumnFull, int rangeEnd) {
+	private int humanMove(int rangeEnd) {
 		
-		//words that prompts the player to enter column number
+		//words that prompt the player to enter column number
 		String columnPrompt = (symbol == 'Y')? "Yellow, ":"Red, ";
 		columnPrompt = columnPrompt + "enter your column choice (1-" + rangeEnd + ")";
-		String display = (previousColumnFull)? ("COLUMN FULL! " + columnPrompt):(columnPrompt);	
+		
+		//the display on the input dialog
+		String display = columnPrompt;
+		
+		//the input the player enters later
 		String input;
+		
+		//we don't know yet if the time is up, so set it to false for now
 		boolean timeUp = false;
 		
 		//prompts the user to enter column nnumber
 		//if the given input is not an integer in the range [1, 7], ask again
 		do {
 			
+			//how much time the player has left in String form
 			String time;
 			
+			//start timer if the player is timed
 			if(timer != null) {
 				timer.startTimer();
 				int timeLeft = timer.timeLeftInSecond();
@@ -118,20 +121,27 @@ public class JCPlayer {
 				time = "";
 			}
 			
+			//prompts column
 			input = JOptionPane.showInputDialog(display + time);
 			
+			//ends the program if user clicks cancel
 			if(input == null) {
 				System.exit(0);
 			}
 			
+			//add "invalid input" to display because if the display is shown again, the player must have entered something weird
 			display = "INVALID INPUT! " + columnPrompt;
 			
+			//ends the timer if there is one
 			if(timer != null) {
 				timer.endTimer();
 			}
 			
+			//make sure the input is in numbers before converting it to an integer
+			//ends the loop if the time is up or the user entered a valid input
 		}while((!input.matches("[1-9]") || Integer.parseInt(input) > rangeEnd) && !timeUp);
 		
+		//if time is up, then return -1 to signal that the time is up
 		if(timeUp) {
 			return -1;
 		}
@@ -140,7 +150,7 @@ public class JCPlayer {
 		
 	}
 	
-	//returns a random column number within the range [1,7] that the computer player should drop the checker
+	//returns a random column number within the range [1,rangeEnd] that the computer player should drop the checker
 	private int computerMove(int rangeEnd){
 		
 		int column = (int) (Math.random() * rangeEnd) + 1;
@@ -148,174 +158,5 @@ public class JCPlayer {
 		return column;
 		
 	}
-	
-	private int computerAIMove(JCBoard board) {
-		
-		for(int col = 1; col <= board.getColumnNumber(); col++) {
-			
-			if(board.addChecker(symbol, col)) {
-				if(board.connectedInARow()) {
-					board.takeFromColumn(col);
-					return col;
-				}else {
-					
-					board.takeFromColumn(col);
-					
-				}
-				
-			}
-			
-			
-		}
-		
-		int[] moves = new int[5];
-		for(int i = 0; i < moves.length; i++) {
-			moves[i] = 1;
-		}
-		
-		char otherSymbol = (symbol == 'R')? 'Y':'R';
-		
-		int column = (board.getColumnNumber() + 1) / 2;
-		
-		int maxWin = -100;
-		int columnDecision = 0;
-		
-		for(int i = 1; i <= board.getColumnNumber(); i++) {
-			
-			//int win = aiAssist(board, moves, symbol, otherSymbol);
-			int win = aiAssist(board, column);
-			
-			System.out.println("column " + column + " wins " + win);
-			
-			if(win > maxWin) {
-				maxWin = win;
-				columnDecision = column;
-			}
-			
-			column = (i % 2 == 0)? (column+i) : (column-i);
-			
-		}
-		
-		return columnDecision;
-		
-		
-	}
-	
-	private int aiAssist(JCBoard board, int column, char symbol)
-	
-	/*private int aiRecursion(JCBoard board, int column, char symbol, int value) {
-		
-		if(column > board.getColumnNumber()) {
-			return 0;
-		}else {
-			int wins = aiRecursion(board, column + 1, symbol, value);
-			if(board.addChecker(symbol, column)) {
-				wins = wins + ((board.connectedInARow())? value : 0);
-				board.takeFromColumn(column);
-			}
-			return wins;
-		}
-		
-	}*/
-	
-	/*private int aiAssist(JCBoard board, int[] moves, char symbol, char otherSymbol) {
-		
-		boolean finalReturn = true;
-		
-		for(int i = 1; i < moves.length; i++) {
-			if(moves[i] <= 7) {
-				finalReturn = false;
-			}
-		}
-		
-		if(finalReturn){
-			return 0;
-		}else{
-			
-			int round = moves[0];
-			int currentMoveColumn = moves[round];
-			
-			if(currentMoveColumn > board.getColumnNumber()) {
-				moves[0] = 1;
-				return aiAssist(board, moves, symbol, otherSymbol);
-			}else if(round >= moves.length){
-				
-			}else {
-				char dropSymbol = (round % 2 == 0)? symbol:otherSymbol;
-				int weight = (round % 2 == 0)? round:(-1)*round;
-				weight = (weight >= 0)? (weight * weight) : ((-1) * weight * weight);
-				if(board.addChecker(dropSymbol, currentMoveColumn)) {
-					if(board.connectedInARow()) {
-						board.display();
-						System.out.println("Possible scenario");
-						moves[0]++;
-						board.takeFromColumn(currentMoveColumn);
-						return aiAssist(board, moves, symbol, otherSymbol) + weight;
-					}
-					
-					moves[round]++;
-					
-					int wins = aiAssist(board, moves, symbol, otherSymbol);
-					
-					board.takeFromColumn(currentMoveColumn);
-					
-					return wins;
-				}else {
-					moves[round]++;
-					return aiAssist(board, moves, symbol, otherSymbol);
-				}
-			}
-			
-		}
-		
-	}*/
-	
-	/*private int aiAssist(JCBoard board, int column) {
-		
-		char otherSymbol = (symbol == 'R')? 'Y':'R';
-		
-		if(!board.addChecker(symbol, column)) {
-			return -100;
-		}
-		
-		int wins = 0;
-		
-		for(int column1 = 1; column1 <= board.getColumnNumber(); column1++) {
-			
-			if(board.addChecker(otherSymbol, column1)) {
-				
-				if(board.connectedInARow()) {
-					wins -= 5;
-				}else {
-					
-					for(int column2 = 1; column2 <= board.getColumnNumber(); column2++) {
-						
-						if(board.addChecker(symbol, column2)) {
-							
-							if(board.connectedInARow()) {
-								wins++;
-							}
-							
-							board.takeFromColumn(column2);
-							
-						}
-						
-						
-						
-					}
-					
-				}
-				
-				board.takeFromColumn(column1);
-				
-			}
-			
-		}
-		
-		board.takeFromColumn(column);
-		
-		return wins;
-		
-	}*/
 
 }

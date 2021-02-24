@@ -3,7 +3,7 @@ package connectFour.domain;
 /**
  * @author xuesheng (chenji@thayer.org)
  * Date created: Feb 12, 2021
- * Date due: FEb 24, 2021
+ * Date due: Feb 24, 2021
  * This program simulates the popular board game -- Connect Four
  * This class represents the game board with the checkers
  */
@@ -44,12 +44,12 @@ public class JCBoard {
 		return board[0].length;
 	}
 	
-	//sets all the values in the boards to 'O' to represent null
+	//sets all the values in the boards to '-' to represent null
 	public void newBoards() {
 		
 		for(int i = 0; i < board.length; i++) {
 			for(int j = 0; j < board[i].length; j++) {
-				board[i][j] = 'O';
+				board[i][j] = '-';
 			}
 		}
 		
@@ -81,7 +81,7 @@ public class JCBoard {
 		//the checker is set to the first empty spot along the way
 		while(!dropped) {
 			
-			if(board[row - 1][column - 1] == 'O') {
+			if(board[row - 1][column - 1] == '-') {
 				board[row - 1][column - 1] = symbol;
 				dropped = true;
 			}
@@ -91,33 +91,14 @@ public class JCBoard {
 		
 	}
 	
-	public void takeFromColumn(int column) {
-		
-		int row = 1; //starts from the bottom row
-		boolean taken = false; //becomes true when the checker is set in the board
-		
-		//starts from the bottom row and goes to row 1
-		//the checker is set to the first empty spot along the way
-		while(!taken && row <= board.length) {
-			
-			if(board[row - 1][column - 1] != 'O') {
-				board[row - 1][column - 1] = 'O';
-				taken = true;
-			}
-			
-			row++;
-		}
-		
-	}
-	
 	//returns true if the column specified by the parameter is full with checkers
 	//returns false otherwise
-	private boolean columnFull(int column) {
+	public boolean columnFull(int column) {
 		
 		int count = 0;
 		
 		for(char[] rows : board) {
-			if(rows[column - 1] != 'O') {
+			if(rows[column - 1] != '-') {
 				count++;
 			}
 		}
@@ -161,7 +142,7 @@ public class JCBoard {
 				boolean connectedHorizontal = true;
 				
 				//checks if the spot has a checker in it
-				if(row[j] == 'O') {
+				if(row[j] == '-') {
 					connectedHorizontal = false;
 				}
 				
@@ -198,7 +179,7 @@ public class JCBoard {
 				boolean connectedVertical = true;
 				
 				//checks if there is a checker in the spot
-				if(board[i][j] == 'O') {
+				if(board[i][j] == '-') {
 					connectedVertical = false;
 				}
 				
@@ -222,19 +203,19 @@ public class JCBoard {
 		
 	}
 	
-	//returns true if there are a specified amount checkers of the same symbol connected diagonally upward
+	//returns true if there are ${connect} checkers of the same symbol connected diagonally upward
 	//returns false otherwise
 	private boolean connectedUpwardDiagonal() {
 		
-		//goes through the left four spots of the bottom three row
-		//for each spot, check it is the same as the three spots on its topright
+		//goes through the spots that have at least (${connect} - 1) amount of spots on its top right
+		//for each spot, check it is the same as the (${connect} - 1) spots on its topright
 		for(int i = connect - 1; i < board.length; i++) {
 			
 			for(int j = 0; j <= board[i].length - connect; j++) {
 				
 				boolean connectedDiagonal = true;
 				
-				if(board[i][j] == 'O') {
+				if(board[i][j] == '-') {
 					connectedDiagonal = false;
 				}
 				
@@ -256,19 +237,19 @@ public class JCBoard {
 		
 	}
 	
-	//returns true if there are four checkers of the same symbol connected diagonally downward
+	//returns true if there are ${connect} checkers of the same symbol connected diagonally downward
 	//returns false otherwise
 	private boolean connectedDownwardDiagonal() {
 		
-		//goes through the left four spots of the top three row
-		//for each spot, check it is the same as the three spots on its bottomright
+		//goes through the spots that have at least (${connect} - 1) amount of spots on its bottom right
+		//for each spot, check it is the same as the (${connect} - 1) spots on its bottom right
 		for(int i = 0; i <= board.length - connect; i++) {
 			
 			for(int j = 0; j <= board[i].length - connect; j++) {
 				
 				boolean connectedDownwardDiagonal = true;
 				
-				if(board[i][j] == 'O') {
+				if(board[i][j] == '-') {
 					connectedDownwardDiagonal = false;
 				}
 				
@@ -292,7 +273,7 @@ public class JCBoard {
 	}
 	
 	//prints out the board
-	//'O' represents that there is no checker in the spot
+	//'-' represents that there is no checker in the spot
 	public void display() {
 		
 		System.out.print("    ");
